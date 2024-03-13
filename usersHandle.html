@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Handle</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Registered Users</h1>
+    <header>
+        <a id="adminDashBoard" href="#" onclick="adminDashBoard()">adminDashBoard</a>
+    </header>
+    <table id="userTable">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Email</th>
+                <th>Password</th>
+                <th>Role</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <script>
+        adminDashBoard = () => {
+            window.location.href = 'adminDashBoard.html';
+        };
+        document.addEventListener("DOMContentLoaded", function () {
+            const userTable = document.getElementById("userTable");
+            const userAccounts = JSON.parse(localStorage.getItem("userAccounts")) || [];
+
+            userAccounts.forEach(user => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${user.id}</td>
+                    <td>${user.email}</td>
+                    <td>${user.password}</td>
+                    <td>
+                        <input type="radio" name="role${user.id}" value="Admin"> Admin
+                        <input type="radio" name="role${user.id}" value="User" ${user.role === 'User' ? 'checked' : ''}> User
+                        <button onclick="addRole(${user.id})">Add Role</button>
+                    </td>
+                    <td><button onclick="deleteUser(${user.id})">Delete</button></td>
+                `;
+                userTable.querySelector("tbody").appendChild(row);
+            });
+        });
+
+        function addRole(userId) {
+            const userAccounts = JSON.parse(localStorage.getItem("userAccounts")) || [];
+            const selectedRole = document.querySelector(`input[name=role${userId}]:checked`).value;
+
+            const userIndex = userAccounts.findIndex(user => user.id === userId);
+            if (userIndex !== -1) {
+                userAccounts[userIndex].role = selectedRole;
+                localStorage.setItem("userAccounts", JSON.stringify(userAccounts));
+                alert(`Role set to ${selectedRole} for user with ID ${userId}`);
+            }
+        }
+
+        function deleteUser(userId) {
+            let userAccounts = JSON.parse(localStorage.getItem("userAccounts")) || [];
+            userAccounts = userAccounts.filter(user => user.id !== userId);
+            localStorage.setItem("userAccounts", JSON.stringify(userAccounts));
+            location.reload(); 
+        }
+    </script>
+</body>
+
+</html>

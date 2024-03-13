@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login</title>
+  <style>
+    form {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      width: 300px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    input {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 12px;
+      box-sizing: border-box;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    button {
+      background-color: #4caf50;
+      color: #fff;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    .signup-link {
+      text-align: center;
+      margin-top: 12px;
+    }
+
+    .signup-link a {
+      color: #007bff;
+      text-decoration: none;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Login</h1>
+  <form id="loginForm" method="POST" action="/login">
+    <label>
+      Email:
+      <input type="email" name="email" required>
+    </label>
+    <br><br>
+    <label>
+      Password:
+      <input type="password" name="password" required>
+    </label>
+    <br><br>
+    <button type="submit">Login</button>
+  </form>
+
+  <p>New user? <a href="signup.html">Sign up</a></p>
+  <br>
+
+  <script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+      const loginForm = document.getElementById("loginForm");
+
+      loginForm.addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        const email = loginForm.email.value;
+        const password = loginForm.password.value;
+        const userAccounts = JSON.parse(localStorage.getItem("userAccounts")) || [];
+        const user = userAccounts.find(user => user.email === email && user.password === password);
+
+        if (user) {
+          if (!user.role) {
+            alert("User Not authenticated.");
+          } else {
+            const currentUserArray = [];
+            currentUserArray.push(user);
+
+            localStorage.setItem("currentUser", JSON.stringify(currentUserArray));
+
+            if (user.role === "Admin") {
+              window.location.href = "adminDashboard.html";
+            } else if (user.role === "User") {
+              window.location.href = "dashboard.html";
+            }
+          }
+        } else {
+          alert("Not Authenticated. Please try again.");
+        }
+      });
+    });
+    
+  </script>
+
+</body>
+
+</html>

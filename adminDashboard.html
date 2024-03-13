@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <h1>This is Admin DashBoard</h1>
+    <header>
+        <a id="handleuser" href="#" onclick="handleUser()">handleUser</a>
+        <a id="addProduct" href="#" onclick="AddProducts()">AddProducts</a>
+        <a id="logout" href="#" onclick="logout()">logout</a>
+    </header>
+    <script>
+        logout= () => {
+            window.location.href = 'homePage.html';
+        };
+        handleUser = () => {
+            window.location.href = 'usersHandle.html';
+        };
+        AddProducts = () => {
+            window.location.href = 'productAdd.html';
+        };
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            align-items: center;
+        }
+
+        .product-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .modal p {
+            margin-bottom: 10px;
+        }
+
+        .modal button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .product-box {
+            flex: 1;
+            flex-basis: calc(17% - 20px);
+            max-width: calc(20% - 20px);
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+
+
+
+        .add-to-cart-btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+        }
+
+        #loadMoreBtn {
+            margin-top: 20px;
+            margin-left: 47%;
+            padding: 10px;
+            background-color: #008CBA;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        #loadMoreBtn:disabled {
+            background-color: #ddd;
+            color: #666;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <a id="loginLink" href="#" onclick="Login()">Login</a>
+    </header>
+    <h2>Product List</h2>
+
+    <div class="product-container" id="productContainer"></div>
+    <button id="loadMoreBtn" onclick="loadMoreProducts()">Load More</button>
+
+
+
+    <div id="loginModal" class="modal">
+        <p>You need to login or sign up to add items to the cart.</p>
+        <button onclick="redirectToLogin()">Login/Sign Up</button>
+        <button onclick="closeLogin()">Close</button>
+    </div>
+
+
+
+    <script>
+        let currentIndex = 0;
+        const productsPerPage = 5;
+
+
+        document.addEventListener("DOMContentLoaded", function () {
+            displayProducts();
+        });
+
+
+        loadMoreProducts = () => {
+            const products = JSON.parse(localStorage.getItem("shreya")) || [];
+            const productContainer = document.getElementById("productContainer");
+            const loadMoreBtn = document.getElementById("loadMoreBtn");
+
+            const startIdx = productContainer.children.length;
+            const endIdx = startIdx + 5;
+
+            products.slice(startIdx, endIdx).forEach((element, index) => {
+                const productBox = document.createElement("div");
+                productBox.className = "product-box";
+
+                const productPhoto = document.createElement("img");
+                productPhoto.src = element.photo || "back-pic.jpg";
+                productPhoto.alt = element.pname;
+                productPhoto.style.maxWidth = "100%";
+                productBox.appendChild(productPhoto);
+
+                const productName = document.createElement("p");
+                productName.innerHTML = `<b>${element.pname}</b>`;
+
+                const productPrice = document.createElement("p");
+                productPrice.textContent = `Price: ${element.price}`;
+
+                const addToCartBtn = document.createElement("button");
+                addToCartBtn.className = "add-to-cart-btn";
+                addToCartBtn.textContent = "Add to Cart";
+                addToCartBtn.onclick = () => addToCart(startIdx + index);
+
+                productBox.appendChild(productName);
+                productBox.appendChild(productPrice);
+                productBox.appendChild(addToCartBtn);
+
+                productContainer.appendChild(productBox);
+            });
+
+            if (endIdx >= products.length) {
+                loadMoreBtn.disabled = true;
+            }
+        }
+
+        function addToCart(index) {
+            const loginPopup = document.getElementById("loginModal");
+            loginPopup.style.display = "block";
+        }
+
+        displayProducts = () => {
+            const products = JSON.parse(localStorage.getItem("shreya")) || [];
+            const productContainer = document.getElementById("productContainer");
+
+            productContainer.innerHTML = "";
+
+            products.slice(currentIndex, currentIndex + productsPerPage).forEach((element, index) => {
+                const productBox = document.createElement("div");
+                productBox.className = "product-box";
+
+                const productPhoto = document.createElement("img");
+                productPhoto.src = element.photo || "back-pic.jpg";
+                productPhoto.alt = element.pname;
+                productPhoto.style.maxWidth = "100%";
+
+                const productName = document.createElement("p");
+                productName.innerHTML = `<b>${element.pname}</b>`;
+
+                const productPrice = document.createElement("p");
+                productPrice.textContent = `Price: ${element.price}`;
+
+                const addToCartBtn = document.createElement("button");
+                addToCartBtn.className = "add-to-cart-btn";
+                addToCartBtn.textContent = "Add to Cart";
+                addToCartBtn.onclick = () => addToCart(currentIndex + index);
+
+
+                productBox.appendChild(productPhoto);
+                productBox.appendChild(productName);
+                productBox.appendChild(productPrice);
+                productBox.appendChild(addToCartBtn);
+
+                productContainer.appendChild(productBox);
+            });
+
+            const loadMoreBtn = document.getElementById("loadMoreBtn");
+            if (currentIndex + productsPerPage >= products.length) {
+                loadMoreBtn.disabled = true;
+            } else {
+                loadMoreBtn.disabled = false;
+            }
+        };
+
+        redirectToLogin = () => {
+            window.location.href = 'login.html';
+        };
+
+        Login = () => {
+            window.location.href = "login.html";
+        }
+
+        closeLogin = () => {
+            document.getElementById("loginModal").style.display = "none";
+            window.location.href = 'homePage.html';
+        };
+
+    </script>
+
+</body>
+
+</html>

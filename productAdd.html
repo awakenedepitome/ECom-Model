@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Table with Update and Delete</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        table,th,td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <a id="adminDashBoard" href="#" onclick="adminDashBoard()">adminDashBoard</a>
+    </header>
+
+    <h2>Add Products</h2>
+    <input type="text" id="productName" placeholder="Enter Product Name">
+    <input type="number" id="quantity" placeholder="Enter Quantity">
+    <input type="number" id="price" placeholder="Enter Price">
+    <button onclick="addProduct()">Add</button>
+
+    <div id="item_table">
+
+    </div>
+
+
+    <script>
+         adminDashBoard = () => {
+            window.location.href = 'adminDashBoard.html';
+        };
+        let pname = document.getElementById("productName");
+        let pquantity = document.getElementById("quantity");
+        let price = document.getElementById("price");
+
+        let currentIndex =null ;
+
+        addProduct = () => {
+            const products = JSON.parse(localStorage.getItem("shreya")) || [];
+
+            const data = {
+                "id": new Date().getTime(),
+                "pname": pname.value,
+                "pquantity": pquantity.value,
+                "price": price.value
+            }
+            pname.value = "";
+            pquantity.value = "";
+            price.value = "";
+
+            if (currentIndex !== null) {
+                products[currentIndex] = data;
+                currentIndex = null;
+            } else {
+                products.push(data);
+            }
+            localStorage.setItem("shreya", JSON.stringify(products));
+            showData();
+        }
+
+        showData = () => {
+            const products = JSON.parse(localStorage.getItem("shreya")) || [];
+            const item_table = document.getElementById("item_table");
+            
+            let table = document.createElement("table");
+            let head = table.createTHead();
+            let row = head.insertRow();
+
+            let cell1 = row.insertCell(0);
+            let cell2 = row.insertCell(1);
+            let cell3 = row.insertCell(2);
+            let cell4 = row.insertCell(3);
+
+            cell1.innerHTML = "<b>Product</b>"
+            cell2.innerHTML = "<b>Product_Quantity</b>"
+            cell3.innerHTML = "<b>Product_Price</b>"
+            cell4.innerHTML = "<b>Actions</b>"
+
+            let body = table.createTBody();
+            products.forEach((element, index) => {
+                let row = body.insertRow();
+                let cell1 = row.insertCell(0);
+                let cell2 = row.insertCell(1);
+                let cell3 = row.insertCell(2);
+                let cell4 = row.insertCell(3);
+
+                cell1.innerHTML = element.pname;
+                cell2.innerHTML = element.pquantity;
+                cell3.innerHTML = element.price;
+                cell4.innerHTML = `<button onclick="updateProduct(${index})">Update</button> <button onclick="deleteProduct(${index})">Delete</button>`;
+            });
+
+            item_table.innerHTML = "";
+            item_table.appendChild(table);
+        }
+
+
+        updateProduct = (index) => {
+            currentIndex = index;
+            const products = JSON.parse(localStorage.getItem("shreya")) || [];
+            pname.value = products[index].pname;
+            pquantity.value = products[index].pquantity;
+            price.value = products[index].price;
+        }
+
+
+        deleteProduct = (index) => {
+            const products = JSON.parse(localStorage.getItem("shreya")) || [];
+            products.splice(index, 1);
+            localStorage.setItem("shreya", JSON.stringify(products));
+
+            showData();
+        }
+
+        showData();
+
+
+    </script>
+
+</body>
+
+</html>

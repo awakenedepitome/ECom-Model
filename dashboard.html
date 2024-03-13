@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            align-items: center;
+        }
+
+        .product-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .modal p {
+            margin-bottom: 10px;
+        }
+
+        .modal button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .product-box {
+            flex: 1;
+            flex-basis: calc(17% - 20px);
+            max-width: calc(20% - 20px);
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+
+
+        .add-to-cart-btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+        }
+
+        #loadMoreBtn {
+            margin-top: 20px;
+            margin-left: 47%;
+            padding: 10px;
+            background-color: #008CBA;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        #loadMoreBtn:disabled {
+            background-color: #ddd;
+            color: #666;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <a id="logout" href="#" onclick="Logout()">Logout</a>
+        <a id="cart" href="#" onclick="Cart()">MyCart</a>
+    </header>
+    <h2>Product List</h2>
+
+    <div class="product-container" id="productContainer"></div>
+    <button id="loadMoreBtn" onclick="loadMoreProducts()">Load More</button>
+
+    <div class="modal" id="myModal">
+        <p>Product successfully added to cart!</p>
+        <button onclick="backToDashboard()">Back to Shopping!</button>
+        <button onclick="goToCart()">Go to Cart</button>
+    </div>
+
+
+
+    <script>
+        let currentIndex = 0;
+        const productsPerPage = 5;
+
+
+        const currentUser = JSON.parse(localStorage.getItem("currentUser")) || [];
+        const userId = currentUser[0].id;
+
+        let modal = document.getElementById("myModal");
+
+        document.addEventListener("DOMContentLoaded", function () {
+            displayProducts();
+        });
+
+        displayProducts = () => {
+            const products = JSON.parse(localStorage.getItem("shreya")) || [];
+            const productContainer = document.getElementById("productContainer");
+
+            productContainer.innerHTML = "";
+
+            products.slice(currentIndex, currentIndex + productsPerPage).forEach((element, index) => {
+                const productBox = document.createElement("div");
+                productBox.className = "product-box";
+
+                const productPhoto = document.createElement("img");
+                productPhoto.src = element.photo || "back-pic.jpg";
+                productPhoto.alt = element.pname;
+                productPhoto.style.maxWidth = "100%";
+                productBox.appendChild(productPhoto);
+
+                const productName = document.createElement("p");
+                productName.innerHTML = `<b>${element.pname}</b>`;
+
+                const productPrice = document.createElement("p");
+                productPrice.textContent = `Price: ${element.price}`;
+
+                const addToCartBtn = document.createElement("button");
+                addToCartBtn.className = "add-to-cart-btn";
+                addToCartBtn.textContent = "Add to Cart";
+                addToCartBtn.onclick = () => addToCart(userId, currentIndex + index);
+
+                productBox.appendChild(productName);
+                productBox.appendChild(productPrice);
+                productBox.appendChild(addToCartBtn);
+
+                productContainer.appendChild(productBox);
+            });
+
+            const loadMoreBtn = document.getElementById("loadMoreBtn");
+            if (currentIndex + productsPerPage >= products.length) {
+                loadMoreBtn.disabled = true;
+            } else {
+                loadMoreBtn.disabled = false;
+            }
+        };
+
+
+
+        loadMoreProducts = () => {
+            const products = JSON.parse(localStorage.getItem("shreya")) || [];
+            const productContainer = document.getElementById("productContainer");
+            const loadMoreBtn = document.getElementById("loadMoreBtn");
+
+            const startIdx = productContainer.children.length;
+            const endIdx = startIdx + 5;
+
+            products.slice(startIdx, endIdx).forEach((element, index) => {
+                const productBox = document.createElement("div");
+                productBox.className = "product-box";
+
+                const productPhoto = document.createElement("img");
+                productPhoto.src = element.photo || "back-pic.jpg";
+                productPhoto.alt = element.pname;
+                productPhoto.style.maxWidth = "100%";
+
+                const productName = document.createElement("p");
+                productName.innerHTML = `<b>${element.pname}</b>`;
+
+                const productPrice = document.createElement("p");
+                productPrice.textContent = `Price: ${element.price}`;
+
+                const addToCartBtn = document.createElement("button");
+                addToCartBtn.className = "add-to-cart-btn";
+                addToCartBtn.textContent = "Add to Cart";
+                addToCartBtn.onclick = () => addToCart(userId, startIdx + index);
+
+                productBox.appendChild(productPhoto);
+                productBox.appendChild(productName);
+                productBox.appendChild(productPrice);
+                productBox.appendChild(addToCartBtn);
+
+                productContainer.appendChild(productBox);
+            });
+
+            if (endIdx >= products.length) {
+                loadMoreBtn.disabled = true;
+            }
+        }
+
+
+        function backToDashboard() {
+            window.location.href = "dashboard.html";
+        }
+        function goToCart() {
+            window.location.href = "addCart.html";
+        }
+
+        function Logout() {
+            window.location.href = "homePage.html";
+        }
+        function Cart() {
+            window.location.href = "addCart.html";
+        }
+
+        function logout() {
+            localStorage.removeItem("currentUser");
+            window.location.href = "homePage.html";
+        }
+
+        window.onclick = function (event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+
+        function createCartForUser(userId) {
+            let userCart = JSON.parse(localStorage.getItem(`cartItems_${userId}`)) || [];
+            if (!userCart.length) {
+                userCart = [];
+            }
+
+            return userCart;
+        }
+
+        function addToCart(userId, index) {
+            const products = JSON.parse(localStorage.getItem("shreya")) || [];
+            const product = products[index];
+
+            const userCart = createCartForUser(userId);
+            const existingItemIndex = userCart.findIndex(item => item.index === index);
+
+            if (existingItemIndex !== -1) {
+                userCart[existingItemIndex].quantity++;
+                userCart[existingItemIndex].price += product.price;
+            } else {
+                userCart.push({
+                    index,
+                    productId: product.id,
+                    productName: product.pname,
+                    quantity: 1,
+                    price: product.price
+                });
+            }
+
+            localStorage.setItem(`cartItems_${userId}`, JSON.stringify(userCart));
+
+            modal.style.display = "block";
+        };
+
+
+
+
+    </script>
+
+</body>
+
+</html>
